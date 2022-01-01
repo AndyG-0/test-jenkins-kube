@@ -3,25 +3,22 @@ podTemplate(yaml: '''
     kind: Pod
     spec:
       containers:
-      - name: maven
-        image: maven:3.8.1-jdk-8
-        command:
-        - sleep
-        args:
-        - 99d
-      - name: golang
-        image: golang:1.16.5
+      - name: helm-kubectl
+        image: dtzar/helm-kubectl
         command:
         - sleep
         args:
         - 99d
 ''') {
   node(POD_LABEL) {
-    stage('Get a Maven project') {
-      git 'https://github.com/jenkinsci/kubernetes-plugin.git'
-      container('maven') {
-        stage('Build a Maven project') {
-          sh 'mvn -B -ntp clean install'
+    stage('Clone docker-registry') {
+      git 'https://github.com/AndyG-0/docker-registry.git'
+      container('helm-kubectl') {
+        stage('Show all pods') {
+          sh 'kubectl get pods'
+        }
+        stage('Show all releases') {
+          sh 'helm list'
         }
       }
     }
